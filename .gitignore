@@ -1,0 +1,16 @@
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Package artifacts
+dist/
+*.zip
+*.tar.gz
