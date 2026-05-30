@@ -1,0 +1,25 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-*
+
+# Build / Dependencies
+node_modules/
+vendor/
+*.log
+
+# Environment
+.env
+.env.local
+
+# WordPress specifics (not used at root level, but avoid accidents)
+wp-content/
+wp-config.php
+
+# Git submodule artifacts (should not be tracked)
+# Submodules are tracked as gitlinks in the index
