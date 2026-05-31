@@ -16,6 +16,7 @@
 - **修复**：Sakurairo 主题 CSS 冲突（blockquote FontAwesome 图标、暗色模式覆盖等）
 - **发布**：通过 MCP 桥安全发布文章/页面到 WordPress
 - **写作**：中文技术文档规范 + 博客文章风格指南
+- **图表**：`babel-arcaea-code + Githuber MD + MerPress + Sakurairo` 的前台 Mermaid / Markmap 写作方案
 
 ## ✨ 核心内容
 

@@ -1,7 +1,7 @@
 ---
 name: sakurairo-arcaea-blog-skill
 description: 应用 Arcaea/音游玻璃拟态风格 Sakurairo WordPress 博客的组合技能。封装了多轮迭代设计的精确 CSS 数值、配色 Token、层级体系、Sakurairo 主题冲突覆盖方案和 WordPress MCP 发布工作流。一个文件解决全部。
-version: 1.11.0
+version: 1.12.0
 ---
 
 # Sakurairo Arcaea Blog Skill
@@ -89,6 +89,50 @@ Arcaea 的视觉气质是 **"遥远、冰冷、孤独"**——白色空间 + 碎
 ```css
 :root{--arcaea-bg:rgba(8,21,42,0.42);--arcaea-border:rgba(230,238,255,0.78);--arcaea-primary:rgba(238,244,255,0.96);--arcaea-accent:#9db4ff;--arcaea-text:rgba(238,244,255,0.94);--arcaea-muted:rgba(238,244,255,0.65);--arcaea-hash:rgba(255,130,130,0.55)}.arcaea-article-content{position:relative;z-index:1;color:var(--arcaea-text);max-width:100%}.arcaea-article-content h2{color:rgba(238,244,255,0.96);font-size:1.65em;font-weight:700;margin-top:2em;margin-bottom:0.6em;padding-bottom:0.3em;border-bottom:1px solid rgba(230,238,255,0.40);text-shadow:0 2px 10px rgba(0,0,0,0.45)}.arcaea-article-content h3{display:flex;align-items:center;gap:10px;color:rgba(238,244,255,0.96);font-size:1.35em;font-weight:700;margin-top:1.5em;margin-bottom:0.5em;text-shadow:0 2px 10px rgba(0,0,0,0.45)}.arcaea-article-content h3::before{content:"#";color:var(--arcaea-hash);font-size:0.9em;font-weight:700;flex-shrink:0}.arcaea-article-content h2::after,.arcaea-article-content h3::after{display:none!important}.arcaea-article-content p{line-height:1.8;margin:1em 0;color:rgba(238,244,255,0.94)}.arcaea-article-content pre,.arcaea-article-content pre.wp-block-preformatted,.arcaea-article-content pre.arcaea-code,.arcaea-article-content pre[class*="language-"]{font-family:"FiraCode Nerd Font","Fira Code",Consolas,monospace!important;font-size:15px;line-height:1.7;background:rgba(8,21,42,0.42)!important;color:rgba(238,244,255,0.94)!important;border:1px solid rgba(230,238,255,0.78);border-radius:10px;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12);padding:1.35rem 1.5rem;margin:2rem 0;overflow:auto}.arcaea-article-content code{font-family:"FiraCode Nerd Font","Fira Code",Consolas,monospace!important;background:rgba(230,238,255,0.10);padding:0.2em 0.4em;border-radius:4px;font-size:0.9em;color:rgba(238,244,255,0.94)!important}.arcaea-article-content pre code{background:transparent;padding:0;border-radius:0;font-size:inherit;color:inherit!important}.arcaea-article-content blockquote{background:rgba(8,21,42,0.42)!important;border:1px solid rgba(230,238,255,0.78)!important;border-left:3px solid rgba(230,238,255,0.90)!important;border-radius:10px!important;padding:14px 20px!important;margin:14px 0!important;color:rgba(238,244,255,0.94)!important;box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)!important;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%)}.arcaea-article-content blockquote::before{display:none!important;content:none!important}.arcaea-article-content blockquote::after{display:none!important;content:none!important}.arcaea-article-content table{border-collapse:collapse;width:100%;margin:1.5em 0;background:rgba(8,21,42,0.42);border:1px solid rgba(230,238,255,0.78);border-radius:10px;overflow:hidden;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)}.arcaea-article-content th,.arcaea-article-content td{padding:10px 14px;border:1px solid rgba(230,238,255,0.20);text-align:left}.arcaea-article-content th{background:rgba(139,167,255,0.12);color:rgba(238,244,255,0.96);font-weight:600}.arcaea-article-content ul,.arcaea-article-content ol{padding-left:1.5em;margin:0.8em 0}.arcaea-article-content li{margin:0.4em 0;line-height:1.7;color:rgba(238,244,255,0.92);font-weight:600}.arcaea-article-content a{color:#8ad8ff;text-decoration:none;border-bottom:1px solid rgba(138,216,255,0.25);transition:border-color 0.2s}.arcaea-article-content a:hover{border-bottom-color:rgba(138,216,255,0.6)}.arcaea-article-content hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(230,238,255,0.30),transparent);margin:2em 0}.arcaea-article-content img{border-radius:10px;max-width:100%;height:auto}.arcaea-article-content figure{margin:1.5em 0}.arcaea-article-content figcaption{text-align:center;font-size:0.85em;color:var(--arcaea-muted);margin-top:0.5em}.arcaea-article-content .wp-block-heading{color:inherit}.arcaea-article-content .wp-block-paragraph{color:inherit}.arcaea-article-content .wp-block-table{overflow-x:auto}.arcaea-article-content .wp-block-group{background:rgba(8,21,42,0.42);border:1px solid rgba(230,238,255,0.78);border-radius:10px;padding:16px;margin:1.5em 0;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)}@media(prefers-reduced-motion:reduce){.arcaea-article-content *{animation:none!important;transition:none!important}}
 ```
+
+### Mermaid 兼容模式（v1.12.0 新增）
+
+`babel-arcaea-code` 现已内置 Mermaid 三档兼容模式：
+
+- `关闭`：完全不预处理
+- `自动`：只在检测到 `subgraph -> subgraph` 连线时改写
+- `强制开启`：对所有 `flowchart/graph` 边语句都尝试兼容改写
+
+适用背景：
+
+- Sakurairo 会对正文里的 `p` 应用统一排版规则，例如全局 `p { margin-bottom: 1.5em; }`
+- 内容样式还会继续叠加 `.entry-content p { line-height: 30px; }`、段落 margin 等规则
+- Mermaid 的 flowchart 节点在某些情况下会落到 `foreignObject > div > span > p` 这套 HTML label 结构
+- 当图里使用 `subgraph -> subgraph` 连线时，Sakurairo 的正文段落样式更容易把 Mermaid 的布局计算拉偏，导致超大画布或只显示一部分
+
+结论：
+
+- 这不是 Markdown 源文本损坏
+- 也不是 Mermaid 文件版本错乱
+- 更像是 **Sakurairo 正文段落样式进入 Mermaid HTML label 布局链** 后，在特定图结构下触发的渲染异常
+
+前台兼容策略：
+
+- 不改文章原文
+- 只在前台渲染前改写内存中的 Mermaid 源码
+- 把 `subgraph -> subgraph` 连线改写为“前一个子图的末节点 -> 后一个子图的首节点”
+
+推荐默认值：
+
+- 技术博客、流程图较多：`自动`
+- 旧文章里大量使用 `subgraph` 直连：`强制开启`
+- 纯普通 Mermaid 图表站点：`关闭` 或 `自动`
+
+当前前台支持语法，统一参考：
+
+- `references/diagram-writing-plan.md`
+
+该参考文档已包含：
+
+- Mermaid / Markmap / LaTeX 当前支持的代码块语法
+- 当前支持的短代码写法
+- `subgraph -> subgraph` 的稳定写法与高风险写法
+- 发布前检查清单
 
 ### 配色体系
 
@@ -788,6 +832,17 @@ a. 确认插件已启用（后台 → 设置 → Arcaea Mermaid）
 b. 在文章编辑器中用 ```` ```mermaid ```` 或 `[mermaid]` 短代码写图
 c. 发布后自动渲染为 Arcaea 风格 SVG（夜空背景 + 冰蓝连线 + 毛玻璃容器）
 d. 主题跟随页面：Arcaea Dark（默认）/ Arcaea Light / Auto
+
+### 技术文章图表写作方案（v1.11.1 新增）
+
+当站点采用 `babel-arcaea-code + Sakurairo + WP Githuber MD / MerPress` 组合时，执行原则：
+
+1. 编辑器不做统一重构：Githuber MD 继续写 ` ```mermaid ` / ` ```markmap `，MerPress 继续使用块编辑器
+2. 前台渲染统一收敛到 `babel-arcaea-code`
+3. Sakurairo PJAX 切页后必须重新扫描 Mermaid / Markmap
+4. 特殊字符如果属于展示文本，放进节点标签文本，不要混进 Mermaid 结构语法
+
+完整方案见：`references/diagram-writing-plan.md`
 
 ### 推荐图表类型
 
