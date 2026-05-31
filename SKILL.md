@@ -507,8 +507,9 @@ MCP Adapter 配置查看：`hermes mcp list`，重载：`/reload-mcp`。
 1. 列出已有文章避免重复：`GET /wp-json/wp/v2/posts?per_page=100&_fields=id,title,slug`
 2. 列出分类和标签，确认分类 ID：`GET /wp-json/wp/v2/categories`、`GET /wp-json/wp/v2/tags`
 3. 构建文章的 HTML 内容（含 `<style>` Arcaea Lite 包裹层）
-4. `POST /wp-json/wp/v2/posts` 传参 `{title, slug, content, categories[], tags[], status="publish", excerpt}`
-5. 额外加 `excerpt` 字段用于文章摘要
+4. **代码块必须带语言类**： `<pre class="language-c"><code>code</code></pre>` 或 `<pre><code class="language-cpp">code</code></pre>`。未加语言类则 `normalizeCodeBlocks` 默认 `language-text`（无色）。
+5. `POST /wp-json/wp/v2/posts` 传参 `{title, slug, content, categories[], tags[], status="publish", excerpt}`
+6. 额外加 `excerpt` 字段用于文章摘要
 
 ### 发布 Pages（更新已有页面）流程
 
@@ -743,6 +744,32 @@ WordPress 文章中的代码块有多种 `<pre>` 标签形式，每种都需要 
 
 发布博文时始终提供 `excerpt` 字段（50-120 字），不要留空。摘要用于分类页和社交分享预览，留空时 WordPress 自动截取正文前几行，效果不可控。
 使用 Python `urllib` + Application Password 直接调用 WordPress REST API 发布Posts和更新Pages。**不是回退方案，是标准方法。** 适用于 MCP 仅有 WPForms 能力、wp_mcp_server.py 不存在的环境。
+
+### 16. 代码块缺少语言类 → 无语法着色（2026-05-30，babel-arcaea-code v1.6.12）
+
+当通过 REST API 发布文章时，如果 `<pre><code>` 块没有 `class="language-xxx"`，代码不会着色。
+
+**症状**：Prism toolbar 显示 "Plain text"，代码无 Token，`.token` 数量为 0。
+
+**原因**：
+- `normalizeCodeBlocks()` 只处理裸 `<pre>`（无 `<code>` 内层），对已有 `<pre><code>` 结构不处理（正则 `(?!\s*<)` 排除了内容以 `<` 开头的情况）
+- JS 端 `preparePrism()` 发现无 `language-` class → 补 `language-text` → 无色
+
+**修复** (babel-arcaea-code v1.6.12)：
+1. `normalizeCodeBlocks()` 新增 pass 2：处理 `<pre><code>` 块，从 `<pre>` 的 `class` 属性提取语言
+2. **发布时必须加语言类**
+
+**正确格式**：
+```html
+<!-- ✅ 方式一：语言类在 <code> 上 -->
+<pre><code class="language-c">void main() { ... }</code></pre>
+<!-- ✅ 方式二：语言类在 <pre> 上（pass 2 会提取到 <code>） -->
+<pre class="language-dart"><code>Scaffold( ... )</code></pre>
+<!-- ❌ 错误：无语言类 → 无色 -->
+<pre><code>void main() { ... }</code></pre>
+```
+
+**常用语言类**：`language-c`, `language-cpp`, `language-python`, `language-js`, `language-bash`, `language-json`, `language-yaml`, `language-dart`, `language-rust`, `language-rust`
 ```python
 token = base64.b64encode(b"user:app-password").decode()
 headers = {"Authorization": f"Basic {token}", "Content-Type": "application/json"}
