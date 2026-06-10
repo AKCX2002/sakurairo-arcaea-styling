@@ -53,6 +53,7 @@ Plugin::init() [Singleton]
   ├── Renderer                  ← the_content filters (priority 0/11/12)
   ├── Markmap/MathJax/KaTeX     ← 预渲染 + 前端渲染
   ├── Compat                    ← 禁用 Sakurairo Prism + APlayer 空容器补丁
+  ├── Abilities                 ← `wp_abilities_api_init` → 注册 `bac/*` WordPress abilities 供 MCP Adapter 发现/执行
   ├── Headers/Health/Blocks     ← 安全头 / 健康检查 / Gutenberg 块
   └── Admin                     ← 设置页面
 ```
@@ -70,6 +71,14 @@ Plugin::init() [Singleton]
 ### KaTeX/MathJax 互斥
 
 `katex_enabled` 和 `mathjax_enabled` 通过 Options 的 `latex_renderer` 字段互斥选择（`katex` 或 `mathjax`）。两者不会同时加载。内联公式 `$...$` 可能被 wpautop 破坏——当前插件只保护 `$$...$$`（display math）的 `protectKatex` 过滤。
+
+### MCP / Abilities 集成
+
+- `babel-arcaea-code` 现内置 `Abilities` 模块，在 `wp_abilities_api_init` 上注册 `bac/*` abilities，供 `wordpress/mcp-adapter` 默认 server 通过 `discover-abilities` / `execute-ability` 使用。
+- 命名采用显式分组，不使用统一 `content_type` 抽象：`bac/posts/*`、`bac/pages/*`、`bac/media/*`、`bac/terms/*`、`bac/users/*`、`bac/comments/*`、`bac/plugins/*` 等。
+- `meta.mcp.public = true` 只表示 MCP 可发现；执行层必须继续按当前 WordPress 用户的对象级 capability 校验内容、媒体、用户、评论、术语、meta 和插件操作。
+- ability 层是纯数据层：保存文章时只接受原始 HTML / Gutenberg blocks，不注入 Mermaid 初始化脚本、不自动转换 Markdown、不包裹文章样式壳。
+- 首版只服务当前 WordPress 站点，不实现 InstaWP 风格的多站点 `site-management`。
 
 ### Mermaid 防御体系（5 层）
 
