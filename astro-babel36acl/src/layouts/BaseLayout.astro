@@ -1,0 +1,50 @@
+---
+import "../styles/site.css";
+import "../styles/arcaea-article-content.css";
+import site from "../data/site.json";
+
+const { title = site.title, description = site.description } = Astro.props;
+
+const navItems = [
+  ["首页", "/"],
+  ["嵌入式专题", "/embedded-topics/"],
+  ["工程复盘", "/engineering-retrospective/"],
+  ["架构与重构", "/architecture-and-refactoring/"],
+  ["方法与工具", "/%e6%96%b9%e6%b3%95%e4%b8%8e%e5%b7%a5%e5%85%b7/"],
+  ["工具箱", "/toolbox/"],
+  ["关于", "/about/"]
+];
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#98b6ff" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <nav class="nav" aria-label="主导航">
+          <a class="brand" href="/">
+            <strong>Babel36acl</strong>
+            <span>Sakurairo / Arcaea Archive</span>
+          </a>
+          <div class="nav-links">
+            {navItems.map(([label, href]) => <a href={href}>{label}</a>)}
+          </div>
+        </nav>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <span>静态迁移自 {site.source}</span>
+          <span>Astro + Sakurairo Arcaea styling</span>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

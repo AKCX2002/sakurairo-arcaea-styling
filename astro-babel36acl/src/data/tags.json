@@ -1,0 +1,30 @@
+[
+  {
+    "id": 11,
+    "count": 12,
+    "description": "",
+    "name": "ARCH",
+    "slug": "arch"
+  },
+  {
+    "id": 8,
+    "count": 0,
+    "description": "",
+    "name": "HPM",
+    "slug": "hpm"
+  },
+  {
+    "id": 9,
+    "count": 0,
+    "description": "",
+    "name": "RISC-V",
+    "slug": "risc-v"
+  },
+  {
+    "id": 10,
+    "count": 0,
+    "description": "",
+    "name": "WSL2",
+    "slug": "wsl2"
+  }
+]

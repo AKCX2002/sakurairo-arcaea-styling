@@ -1,0 +1,161 @@
+---
+import SakurairoLayout from "../layouts/SakurairoLayout.astro";
+import posts from "../data/posts.json";
+import pages from "../data/pages.json";
+import site from "../data/site.json";
+
+export function getStaticPaths() {
+  return [...posts, ...pages].map((entry) => ({
+    params: { slug: entry.route },
+    props: { entry }
+  }));
+}
+
+const { entry } = Astro.props;
+const isPost = entry.type === "post";
+const title = `${entry.title} | ${site.title}`;
+
+function plainText(html) {
+  return String(html || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&hellip;|&#8230;/g, "...")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
+function wordCount(entry) {
+  return plainText(entry.content).length;
+}
+
+function readMinutes(entry) {
+  return Math.max(1, Math.round(wordCount(entry) / 220));
+}
+
+function daysAgo(dateText) {
+  const date = new Date(dateText);
+  const now = new Date();
+  const days = Math.max(0, Math.round((now.valueOf() - date.valueOf()) / 86400000));
+  if (days <= 0) return "今天";
+  return `${days} 天前`;
+}
+
+function galleryImage(entry) {
+  const seed = [17, 44, 23, 93, 40, 27, 58, 66, 35, 71, 12, 84][entry.id % 12];
+  return `https://babel36acl.xyz/wp-json/sakura/v1/gallery?img=w&${seed}`;
+}
+
+function stripHtml(html) {
+  return String(html || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .trim();
+}
+
+function headingId(text, index) {
+  const base = stripHtml(text)
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+  return base || `heading-${index + 1}`;
+}
+
+function addHeadingIds(html) {
+  const headings = [];
+  let index = 0;
+  const content = String(html || "").replace(/<h([2-3])([^>]*)>([\s\S]*?)<\/h\1>/gi, (match, level, attrs, inner) => {
+    const existing = String(attrs).match(/\sid=["']([^"']+)["']/i)?.[1];
+    const id = existing || headingId(inner, index);
+    headings.push({ id, level: Number(level), text: stripHtml(inner) });
+    index += 1;
+    if (existing) return match;
+    return `<h${level}${attrs} id="${id}">${inner}</h${level}>`;
+  });
+  return { content, headings };
+}
+
+const bodyClass = isPost
+  ? `wp-singular post-template-default single single-post postid-${entry.id} single-format-aside wp-theme-Sakurairo chinese-font`
+  : `page-template-default page page-id-${entry.id} wp-theme-Sakurairo chinese-font`;
+
+const { content: entryContent, headings } = addHeadingIds(entry.content);
+---
+
+<SakurairoLayout title={title} bodyClass={bodyClass} landAtHome={false}>
+  <div class="pattern-center-blank"></div>
+  <div class={`pattern-center ${isPost ? "single-center" : ""}`}>
+    <div class="pattern-attachment bg" style={`background-image: url(${galleryImage(entry)});`}></div>
+    <header class={`pattern-header ${isPost ? "single-header" : ""}`}>
+      <h1 class="entry-title">{entry.title}</h1>
+      {
+        isPost && (
+          <>
+            <span class="toppic-line"></span>
+            <p class="entry-census has-splitter">
+              <span>{26} 次阅读</span>
+              <span>预计阅读时间: {readMinutes(entry)} 分钟</span>
+              <span>发布于 {daysAgo(entry.date)}</span>
+              <span>{wordCount(entry)} 字</span>
+            </p>
+          </>
+        )
+      }
+    </header>
+  </div>
+
+  <div id="page" class="site wrapper">
+    <div id="content" class="site-content">
+      <div id="primary" class="content-area">
+        <main id="main" class="site-main" role="main">
+          {isPost && <div class="has-toc have-toc"></div>}
+          <article id={`post-${entry.id}`} class={`post-${entry.id} post type-${entry.type} status-publish format-aside hentry`}>
+            <div class="entry-content" set:html={entryContent} />
+            {
+              isPost && (
+                <footer class="post-footer">
+                  <a class="post-license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh_CN" target="_blank" rel="nofollow" title="此文章遵守 CC BY-SA 4.0 知识共享许可协议">
+                    <i class="fa-brands fa-creative-commons"></i>
+                    <i class="fa-brands fa-creative-commons-by"></i>
+                    <i class="fa-brands fa-creative-commons-sa"></i>
+                  </a>
+                  <div class="info" itemprop="author" itemscope itemtype="http://schema.org/Person">
+                    <a href="/author/chuixin/" class="profile gravatar">
+                      <img class="fa-spin" style="--fa-animation-duration: 15s;" src="https://babel36acl.xyz/wp-json/sakura/v1/avatar" itemprop="image" alt="Babel36acl" height="30" width="30" />
+                    </a>
+                  </div>
+                  <div class="meta"><a href="/author/chuixin/" itemprop="url" rel="author">Babel36acl</a></div>
+                  <div class="desc"><i class="fa-solid fa-feather" aria-hidden="true"></i>此作者没有提供个人介绍。</div>
+                  <div class="post-modified-time"><i class="fa-solid fa-calendar-day" aria-hidden="true"></i>最后更新于 {entry.modified?.slice(0, 10)}</div>
+                  {
+                    entry.tags?.length > 0 && (
+                      <div class="post-tags">
+                        <i class="fa-solid fa-tag" aria-hidden="true"></i>
+                        {entry.tags.map((tag) => <a href="#">{tag.name}</a>)}
+                      </div>
+                    )
+                  }
+                </footer>
+              )
+            }
+          </article>
+          {
+            isPost && headings.length > 0 && (
+              <div class="toc-container">
+                <div class="toc">
+                  <div class="toc-title">目录</div>
+                  <ol>
+                    {headings.map((heading) => (
+                      <li class={`toc-level-${heading.level}`}><a href={`#${heading.id}`}>{heading.text}</a></li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            )
+          }
+        </main>
+      </div>
+    </div>
+  </div>
+</SakurairoLayout>

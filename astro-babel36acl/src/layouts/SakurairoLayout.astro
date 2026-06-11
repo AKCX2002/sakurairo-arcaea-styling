@@ -1,0 +1,186 @@
+---
+const {
+  title = "Babel36acl的个人博客",
+  bodyClass = "home blog wp-theme-Sakurairo hfeed chinese-font",
+  landAtHome = true
+} = Astro.props;
+
+const navItems = [
+  ["首页", "/"],
+  ["学习记录", "/学习记录/"],
+  ["嵌入式专题", "/embedded-topics/"],
+  ["工具箱", "/toolbox/"],
+  ["工程复盘", "/engineering-retrospective/"],
+  ["方法与工具", "/方法与工具/"],
+  ["架构与重构", "/architecture-and-refactoring/"],
+  ["🌌音乐", "/emotional-artcore/"],
+  ["🎮 游戏", "/games/"],
+  ["关于", "/about/"]
+];
+
+const currentPath = Astro.url.pathname;
+
+function normalizePath(path) {
+  return decodeURI(path).replace(/\/+$/, "") || "/";
+}
+
+function isCurrent(href) {
+  const current = normalizePath(currentPath);
+  const target = normalizePath(href);
+  if (target === "/") return current === "/";
+  return current === target || current.startsWith(`${target}/`);
+}
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta name="theme-color" content="#98b6ff" />
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://s4.zstatic.net" crossorigin />
+    <link rel="shortcut icon" href="https://s.nmxc.ltd/sakurairo_vision/@3.0/basic/favicon.ico" />
+    <link rel="stylesheet" href="https://s4.zstatic.net/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-includes/css/dist/block-library/style.min.css?ver=7.0" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/reading/reading-progress.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/reading/content-enhance.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/reading/arcaea-article-content.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/prism/prism.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/prism/themes/arcaea-common.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/prism/themes/arcaea-dark.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/css/bac-prism-wrap.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/plugins/babel-arcaea-code/assets/mermaid/mermaid.css?ver=1781149285" />
+    <link rel="stylesheet" href="https://babel36acl.xyz/wp-content/themes/Sakurairo/css/?iro_header&github&wave&minify&3.0.10" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+SC|Noto+Sans+SC|Fira+Code|Zen+Old+Mincho&display=swap" />
+    <link rel="stylesheet" href="/sakurairo-astro.css" />
+    <title>{title}</title>
+  </head>
+  <body class={`${bodyClass} dark`}>
+    <div id="preload" aria-hidden="true">
+      <li data-id="3" class="active"><div id="preloader_3"></div></li>
+    </div>
+    <div class="scrollbar" id="bar"></div>
+
+    <header class="site-header no-select" role="banner">
+      <div class="mo-nav-button"><i class="fa-solid fa-bars"></i></div>
+      <div class="mobile-nav">
+        <div class="mo-menu-search">
+          <form class="search-form" method="get" action="/" role="search">
+            <input class="search-input" type="search" name="s" placeholder="搜索..." required />
+          </form>
+        </div>
+        <div class="mo_nav_item">
+          <ul class="menu">
+            {navItems.map(([label, href]) => <li class={isCurrent(href) ? "current-menu-item" : ""}><a href={href}>{label}</a></li>)}
+          </ul>
+        </div>
+      </div>
+
+      <div class="site-branding">
+        <a href="/" aria-label="Babel36acl 首页">
+          <div class="site-title">Babel36acl</div>
+        </a>
+      </div>
+
+      <div class="nav-search-wrapper">
+        <nav>
+          <ul class="menu">
+            {navItems.map(([label, href]) => <li class={isCurrent(href) ? "current-menu-item" : ""}><a href={href}>{label}</a></li>)}
+          </ul>
+        </nav>
+        <div class="nav-search-divider"></div>
+        <div class="searchbox js-toggle-search">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <span class="screen-reader-text">搜索</span>
+        </div>
+        <div class="bg-switch" id="bg-next" style="display:none">
+          <i class="fa-solid fa-dice" aria-hidden="true"></i>
+          <span class="screen-reader-text">切换背景</span>
+        </div>
+      </div>
+
+      <div class="user-menu-wrapper">
+        <div class="header-user-avatar"><i class="fa-solid fa-circle-user"></i></div>
+        <div class="header-user-menu">
+          <div class="header-user-name no-logged">
+            <a id="login-link" href="/wp-login.php" data-no-pjax style="font-weight:bold;text-decoration:none">登录</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="main-container">
+      <slot />
+      <footer id="colophon" class="site-footer" role="contentinfo">
+        <div class="site-info" theme-info="Sakurairo v3.0.10">
+          <div class="footer-content">
+            <p class="footer_info">© 2026 <strong>Babel36acl</strong>
+              <span style="opacity:.65">— 世界は灰色でも、音だけは嘘をつかなかった。</span>
+            </p>
+          </div>
+          <div class="theme-info">
+            <div class="sakura-icon">
+              <svg width="30px" height="30px" class="sakura-svg" viewBox="0 0 1049 1024" xmlns="http://www.w3.org/2000/svg">
+                <path d="M525.58396628 573.34694353s268.83106938-2.62915481 309.36387092 193.24287089l-76.46458293 21.90962291 12.92667757 84.13295086a214.05701289 214.05701289 0 0 1-96.84053193-4.82011663A224.79272784 224.79272784 0 0 1 525.58396628 578.38615666z" fill="#EE9ca7"></path>
+                <path d="M552.75189802 512.4381922s131.45773592-233.7756732 321.63325979-170.89505575L854.2283053 418.66500728l79.31283344 30.89256828a215.59068679 215.59068679 0 0 1-52.58309388 81.50379604 224.57363215 224.57363215 0 0 1-325.35789552-14.67944718z" fill="#EE9ca7"></path>
+                <path d="M508.49446078 494.0341093S317.00435871 306.48774025 426.77156822 139.31731943l69.4535037 38.78003191L547.4935884 109.30113636a214.05701289 214.05701289 0 0 1 65.72886796 71.86356201 225.01182435 225.01182435 0 0 1-98.37420505 310.67844912z" fill="#EE9ca7"></path>
+                <path d="M473.21996809 525.58396628S242.2925454 661.64272234 109.30113636 512.4381922l55.43134521-57.18411482-53.45947909-65.72886795a213.61882069 213.61882069 0 0 1 86.32391269-43.81924506 224.79272784 224.79272784 0 0 1 274.527572 175.27698099z" fill="#EE9ca7"></path>
+                <path d="M481.76472043 566.55496s72.0826585 258.31445093-106.4807652 348.14390364l-40.31370582-68.13892627-78.21735252 34.17901099a212.30424328 212.30424328 0 0 1-20.15685331-94.64956933 224.57363215 224.57363215 0 0 1 241.00584894-219.09622602z" fill="#EE9ca7"></path>
+              </svg>
+            </div>
+            <a href="https://github.com/mirai-mamori/Sakurairo" rel="noopener" target="_blank">Theme Sakurairo</a>
+            <a href="https://docs.fuukei.org/" rel="noopener" target="_blank">by Fuukei</a>
+          </div>
+        </div>
+      </footer>
+    </section>
+
+    <button id="moblieGoTop" title="回到顶部"><i class="fa-solid fa-caret-up fa-lg"></i></button>
+    <button id="changskin" title="控制面板"><i class="fa-solid fa-compass-drafting fa-lg fa-flip"></i></button>
+    <div class={landAtHome ? "background_blur" : "background_blur current_blur"}></div>
+    <script is:inline>
+      (() => {
+        const mobileButton = document.querySelector(".mo-nav-button");
+        const mobileNav = document.querySelector(".mobile-nav");
+        const footer = document.getElementById("colophon");
+        const goTop = document.getElementById("moblieGoTop");
+        const skinButton = document.getElementById("changskin");
+        const progress = document.getElementById("bar");
+
+        mobileButton?.addEventListener("click", () => {
+          mobileNav?.classList.toggle("open");
+          mobileButton.querySelector("i")?.classList.toggle("open");
+        });
+
+        mobileNav?.querySelectorAll("a").forEach((link) => {
+          link.addEventListener("click", () => {
+            mobileNav.classList.remove("open");
+            mobileButton?.querySelector("i")?.classList.remove("open");
+          });
+        });
+
+        goTop?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+        const updateChrome = () => {
+          const y = document.documentElement.scrollTop || document.body.scrollTop;
+          const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+          const active = y > 20 ? "scale(1)" : "scale(0)";
+          if (goTop) goTop.style.transform = active;
+          if (skinButton) skinButton.style.transform = active;
+          if (progress) progress.style.width = `${Math.min(100, Math.round((y / max) * 100))}%`;
+
+          if (footer) {
+            const nearBottom = y + window.innerHeight >= document.documentElement.scrollHeight - 100;
+            footer.classList.toggle("show", nearBottom);
+          }
+        };
+
+        updateChrome();
+        window.addEventListener("scroll", updateChrome, { passive: true });
+        window.addEventListener("resize", updateChrome);
+      })();
+    </script>
+  </body>
+</html>

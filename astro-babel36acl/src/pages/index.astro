@@ -1,0 +1,128 @@
+---
+import SakurairoLayout from "../layouts/SakurairoLayout.astro";
+import posts from "../data/posts.json";
+
+const latestPosts = [...posts]
+  .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf())
+  .slice(0, 12);
+
+function daysAgo(dateText) {
+  const date = new Date(dateText);
+  const now = new Date();
+  const days = Math.max(0, Math.round((now.valueOf() - date.valueOf()) / 86400000));
+  if (days <= 0) return "今天";
+  return `${days} 天前`;
+}
+
+function plainText(html) {
+  return String(html || "")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&hellip;|&#8230;/g, "...")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+}
+
+function wordCount(post) {
+  return plainText(post.content).length;
+}
+
+function readMinutes(post) {
+  return Math.max(1, Math.round(wordCount(post) / 220));
+}
+
+function galleryImage(index) {
+  const seed = [17, 44, 23, 93, 40, 27, 58, 66, 35, 71, 12, 84][index % 12];
+  return `https://babel36acl.xyz/wp-json/sakura/v1/gallery?img=w&${seed}`;
+}
+---
+
+<SakurairoLayout title="Babel36acl的个人博客">
+  <div class="headertop filter-nothing sakurairo-hero">
+    <div id="banner_wave_1"></div>
+    <div id="banner_wave_2"></div>
+    <figure id="centerbg" class="centerbg" style="height: 100vh;">
+      <div class="focusinfo">
+        <h1 class="center-text glitch is-glitching Ubuntu-font" data-text="世界は灰色でも、音だけは嘘をつかなかった。">
+          世界は灰色でも、音だけは嘘をつかなかった。
+        </h1>
+        <div class="header-info">
+          <i class="fa-solid fa-quote-left"></i>
+          <span class="element" style="text-align: center; max-width: 70%;">awaiting resonance...</span>
+          <i class="fa-solid fa-quote-right"></i>
+          <span class="element"></span>
+          <p>风の音を探しています... 目を閉じれば、音が色になる。</p>
+        </div>
+        <div class="top-social">
+          <li>
+            <a href="https://space.bilibili.com/25746729" target="_blank" class="social-bili" title="bilibili">
+              <img alt="bilibili" loading="lazy" src="https://s.nmxc.ltd/sakurairo_vision/@3.0/display_icon/fluent_design/bilibili.webp" />
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/AKCX2002" target="_blank" class="social-github" title="github">
+              <img alt="github" loading="lazy" src="https://s.nmxc.ltd/sakurairo_vision/@3.0/display_icon/fluent_design/github.webp" />
+            </a>
+          </li>
+          <li>
+            <a href="mailto:chuixin-life@outlook.com" class="social-wangyiyun" title="E-mail">
+              <img loading="lazy" alt="E-mail" src="https://s.nmxc.ltd/sakurairo_vision/@3.0/display_icon/fluent_design/mail.webp" />
+            </a>
+          </li>
+        </div>
+      </div>
+    </figure>
+    <div class="headertop-down">
+      <span>
+        <svg class="homepage-downicon" viewBox="0 0 1843 1024" xmlns="http://www.w3.org/2000/svg" width="80px" height="80px">
+          <path d="M1221.06136021 284.43250057a100.69380037 100.69380037 0 0 1 130.90169466 153.0543795l-352.4275638 302.08090944a100.69380037 100.69380037 0 0 1-130.90169467 0L516.20574044 437.48688007A100.69380037 100.69380037 0 0 1 647.10792676 284.43250057L934.08439763 530.52766665l286.97696258-246.09516608z" fill="#d8e6ff"></path>
+        </svg>
+      </span>
+    </div>
+  </div>
+
+  <div id="page" class="site wrapper current_blur">
+    <div class="blank"></div>
+    <div id="content" class="site-content">
+      <div id="primary" class="content-area">
+        <main id="main" class="site-main" role="main">
+          <h1 class="main-title posts-area-title">
+            <i class="fa-regular fa-bookmark" aria-hidden="true"></i>
+            Article
+          </h1>
+
+          {
+            latestPosts.map((post, index) => (
+              <article class="post post-list-thumb post-list-show" itemscope itemtype="http://schema.org/BlogPosting">
+                <div class="post-thumb">
+                  <a href={`/${post.route}/`}>
+                    <img alt="post_img" src={galleryImage(index)} />
+                  </a>
+                </div>
+                <div class="post-date">
+                  <i class="fa-regular fa-clock"></i>发布于 {daysAgo(post.date)}
+                </div>
+                <div class="post-meta">
+                  <span><i class="fa-regular fa-eye"></i>{26 + index * 7} 热度</span>
+                  <span class="comments-number"><i class="fa-regular fa-comment"></i><a href={`/${post.route}/#respond`}>无~</a></span>
+                  {post.categories?.[0] && <span><i class="fa-regular fa-folder"></i> <a href="#">{post.categories[0].name}</a></span>}
+                  <span><i class="fa-regular fa-pen-to-square"></i>{wordCount(post)} 字</span>
+                  <span title="预计阅读时间"><i class="fa-solid fa-hourglass"></i>{readMinutes(post)} 分钟</span>
+                  <span class="meta-author"><a href="/author/chuixin/">Babel36acl</a></span>
+                </div>
+                <div class="post-title">
+                  <a href={`/${post.route}/`}>
+                    <h3>{post.title}</h3>
+                  </a>
+                </div>
+                <div class="post-excerpt">
+                  <div class="ai-excerpt-tip"><i class="fa-solid fa-bars-staggered"></i>摘要</div>
+                  <p>{post.excerpt}</p>
+                </div>
+              </article>
+            ))
+          }
+        </main>
+      </div>
+    </div>
+  </div>
+</SakurairoLayout>

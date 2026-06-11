@@ -7,3 +7,6 @@
 [submodule "babel-arcaea-code"]
 	path = babel-arcaea-code
 	url = https://github.com/AKCX2002/babel-arcaea-code.git
+[submodule "wordpress-dm1-calculator"]
+	path = wordpress-dm1-calculator
+	url = https://github.com/AKCX2002/wordpress-dm1-calculator.git

@@ -1,0 +1,19 @@
+---
+const { post } = Astro.props;
+
+const date = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit"
+}).format(new Date(post.date));
+const terms = post.categories?.map((item) => item.name).join(" / ");
+---
+
+<a class="post-card" href={`/${post.route}/`}>
+  <div>
+    <time datetime={post.date}>{date}</time>
+    <h3>{post.title}</h3>
+    {post.excerpt && <p>{post.excerpt}</p>}
+  </div>
+  {terms && <span class="terms">{terms}</span>}
+</a>

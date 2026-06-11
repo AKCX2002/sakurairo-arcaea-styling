@@ -1,0 +1,44 @@
+[
+  {
+    "id": 6,
+    "count": 3,
+    "description": "记录个人的学习记录",
+    "name": "学习笔记",
+    "slug": "%e5%ad%a6%e4%b9%a0%e7%ac%94%e8%ae%b0"
+  },
+  {
+    "id": 13,
+    "count": 31,
+    "description": "具体故障、调试过程与硬件软件联动问题。",
+    "name": "嵌入式实战",
+    "slug": "embedded-practice"
+  },
+  {
+    "id": 14,
+    "count": 6,
+    "description": "从 bug、文档和修复过程里提炼经验。",
+    "name": "工程复盘",
+    "slug": "engineering-retrospective"
+  },
+  {
+    "id": 16,
+    "count": 14,
+    "description": "分析方法、工作流、工具链与可复用模板。",
+    "name": "方法与工具",
+    "slug": "methods-and-tools"
+  },
+  {
+    "id": 1,
+    "count": 0,
+    "description": "",
+    "name": "未分类",
+    "slug": "uncategorized"
+  },
+  {
+    "id": 15,
+    "count": 11,
+    "description": "分层边界、模块拆分、技术债与重构策略。",
+    "name": "架构与重构",
+    "slug": "architecture-and-refactoring"
+  }
+]
