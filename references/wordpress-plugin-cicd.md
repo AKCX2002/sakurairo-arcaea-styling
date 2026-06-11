@@ -26,7 +26,7 @@ plugin-name/
 │   │   ├── mermaid.css          # Arcaea 玻璃容器 (版本控制)
 │   │   ├── mermaid-init.js      # 初始化脚本 (版本控制)
 │   │   └── chunks/mermaid.esm.min/
-│   │       └── *.mjs + *.map    # 55+ 个 chunk (jsDelivr API 发现+下载)
+│   │       └── *.mjs + *.map    # N 个 chunk (数量随版本变化，jsDelivr API 发现+下载)
 │   ├── mathjax/es5/
 │   │   └── tex-chtml.js         # MathJax 3.x (jsDelivr 下载)
 │   └── js/

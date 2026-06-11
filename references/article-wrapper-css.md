@@ -1,14 +1,40 @@
 # Arcaea Article Wrapper CSS
 
-统一 Arcaea 玻璃卡片风格。深色半透明背景 + 亮白细边框 + 高对比文字 + 轻微毛玻璃。
+> ⚠️ **历史参考**：此文件中的 CSS 代码块是早期快照，与生产代码存在 60%+ 的变量值漂移。
+> **Source of Truth** 是 `babel-arcaea-code/assets/reading/arcaea-article-content.css`。
+> 本文保留设计原则、决策树、表格策略和 arcaea-title-hero 结构说明——这些仍然适用。
+> Token 值请查阅 `references/visual-tokens.md`。
+
+统一 Arcaea 文章阅读风格。目标是保留冷色、漂浮、轻玻璃的气质，同时优先保证长文可读性、表格稳定性和局部作用域安全。
+
+## 设计原则
+
+- 阅读优先：正文、列表、表格不能被装饰性效果抢走层级
+- 局部作用域：变量放在 `.arcaea-article-content`，不要从 `:root` 污染整页
+- 低饱和强调：只保留少量冰蓝/冷白，不使用突兀红色 marker
+- 稳定优先：不要在原生 `<table>` 上直接叠 `overflow: hidden` + `backdrop-filter`
+- 文档优先：Arcaea 是气质，不是牺牲表格可读性的理由
+
+## Wrapper 选择决策树
+
+```
+写博客文章 / 技术长文    → .arcaea-article-content（本文模板）
+Hub / Landing 页面       → .arcaea-wrap（arcaea-lite-wrapper.md）
+Games / Music 分类页     → .games-arcaea-wrap + bg-glow + bg-overlay
+站外分享 / 独立页面      → 单一 HTML + <style> 内联
+```
+
+**绝对禁止**：用 `.arcaea-wrap` 写博客文章正文。`.arcaea-wrap` 是 Hub/landing 页的轻量包裹，不具备长文阅读的稳定性。博客正文必须使用 `.arcaea-article-content`。
+
+**禁止**：将一篇文章拆成 `post.md` + `index.html` 两个文件。正确做法是单一 HTML 文件，`<style>` 块在 `<div class="arcaea-article-content">` 之前。
 
 ## 使用方式
 
-每篇文章内容以以下结构开头：
+常规文章优先复用这份统一模板，不要为每篇文章各自发明一套内联样式。正文结构建议收敛为：
 
 ```html
 <style>
-/* 此处放压缩后的 CSS */
+/* 仅在当前发布链路还不能复用共享模板时，才保留这段局部 CSS */
 </style>
 <div class="arcaea-article-content">
 
@@ -17,21 +43,93 @@
 </div>
 ```
 
-## 压缩版 CSS（用于 WordPress 文章）
+如果文章开头需要 Games 风格的“左侧标题 + 引文 + 右下 TAG”构图，使用：
 
-```css
-:root{--arcaea-bg:rgba(8,21,42,0.42);--arcaea-border:rgba(230,238,255,0.78);--arcaea-primary:rgba(238,244,255,0.96);--arcaea-accent:#9db4ff;--arcaea-text:rgba(238,244,255,0.94);--arcaea-muted:rgba(238,244,255,0.65);--arcaea-hash:rgba(255,130,130,0.55)}.arcaea-article-content{position:relative;z-index:1;color:var(--arcaea-text);max-width:100%}.arcaea-article-content h2{color:rgba(238,244,255,0.96);font-size:1.65em;font-weight:700;margin-top:2em;margin-bottom:0.6em;padding-bottom:0.3em;border-bottom:1px solid rgba(230,238,255,0.40);text-shadow:0 2px 10px rgba(0,0,0,0.45)}.arcaea-article-content h3{display:flex;align-items:center;gap:10px;color:rgba(238,244,255,0.96);font-size:1.35em;font-weight:700;margin-top:1.5em;margin-bottom:0.5em;text-shadow:0 2px 10px rgba(0,0,0,0.45)}.arcaea-article-content h3::before{content:"#";color:var(--arcaea-hash);font-size:0.9em;font-weight:700;flex-shrink:0}.arcaea-article-content h2::after,.arcaea-article-content h3::after{display:none!important}.arcaea-article-content p{line-height:1.8;margin:1em 0;color:rgba(238,244,255,0.94)}.arcaea-article-content pre,.arcaea-article-content pre.wp-block-preformatted,.arcaea-article-content pre.arcaea-code,.arcaea-article-content pre[class*="language-"]{font-family:"FiraCode Nerd Font","Fira Code",Consolas,monospace!important;font-size:15px;line-height:1.7;background:rgba(8,21,42,0.42)!important;color:rgba(238,244,255,0.94)!important;border:1px solid rgba(230,238,255,0.78);border-radius:10px;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12);padding:1.35rem 1.5rem;margin:2rem 0;overflow:auto}.arcaea-article-content code{font-family:"FiraCode Nerd Font","Fira Code",Consolas,monospace!important;background:rgba(230,238,255,0.10);padding:0.2em 0.4em;border-radius:4px;font-size:0.9em;color:rgba(238,244,255,0.94)!important}.arcaea-article-content pre code{background:transparent;padding:0;border-radius:0;font-size:inherit;color:inherit!important}.arcaea-article-content blockquote{background:rgba(8,21,42,0.42)!important;border:1px solid rgba(230,238,255,0.78)!important;border-left:3px solid rgba(230,238,255,0.90)!important;border-radius:10px!important;padding:14px 20px!important;margin:14px 0!important;color:rgba(238,244,255,0.94)!important;box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)!important;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%)}.arcaea-article-content blockquote::before{display:none!important;content:none!important}.arcaea-article-content blockquote::after{display:none!important;content:none!important}.arcaea-article-content table{border-collapse:collapse;width:100%;margin:1.5em 0;background:rgba(8,21,42,0.42);border:1px solid rgba(230,238,255,0.78);border-radius:10px;overflow:hidden;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)}.arcaea-article-content th,.arcaea-article-content td{padding:10px 14px;border:1px solid rgba(230,238,255,0.20);text-align:left}.arcaea-article-content th{background:rgba(139,167,255,0.12);color:rgba(238,244,255,0.96);font-weight:600}.arcaea-article-content ul,.arcaea-article-content ol{padding-left:1.5em;margin:0.8em 0}.arcaea-article-content li{margin:0.4em 0;line-height:1.7;color:rgba(238,244,255,0.92);font-weight:600}.arcaea-article-content a{color:#8ad8ff;text-decoration:none;border-bottom:1px solid rgba(138,216,255,0.25);transition:border-color 0.2s}.arcaea-article-content a:hover{border-bottom-color:rgba(138,216,255,0.6)}.arcaea-article-content hr{border:none;height:1px;background:linear-gradient(90deg,transparent,rgba(230,238,255,0.30),transparent);margin:2em 0}.arcaea-article-content img{border-radius:10px;max-width:100%;height:auto}.arcaea-article-content figure{margin:1.5em 0}.arcaea-article-content figcaption{text-align:center;font-size:0.85em;color:var(--arcaea-muted);margin-top:0.5em}.arcaea-article-content .wp-block-heading{color:inherit}.arcaea-article-content .wp-block-paragraph{color:inherit}.arcaea-article-content .wp-block-table{overflow-x:auto}.arcaea-article-content .wp-block-group{background:rgba(8,21,42,0.42);border:1px solid rgba(230,238,255,0.78);border-radius:10px;padding:16px;margin:1.5em 0;backdrop-filter:blur(12px) saturate(130%);-webkit-backdrop-filter:blur(12px) saturate(130%);box-shadow:0 12px 36px rgba(0,0,0,0.22),inset 0 1px 0 rgba(255,255,255,0.12)}@media(prefers-reduced-motion:reduce){.arcaea-article-content *{animation:none!important;transition:none!important}}
+```html
+<header class="arcaea-title-hero">
+  <div class="arcaea-title-main">
+    <h1><span class="arcaea-title-icon">🎮</span>Games</h1>
+  </div>
+  <p class="arcaea-title-quote">
+    <span>游戏对我来说，并不只是「消遣」。<br>
+    更像是一种：情绪共鸣、世界观沉浸、<br>
+    孤独探索、系统体验、抽象叙事的集合。</span>
+  </p>
+  <ul class="arcaea-title-tags">
+    <li>废墟文明</li>
+    <li>数字空间</li>
+    <li>孤独感</li>
+    <li>Meta</li>
+    <li>存在主义</li>
+    <li>碎片化叙事</li>
+    <li>系统深度</li>
+    <li>超现实</li>
+  </ul>
+</header>
 ```
 
-## 配色说明
+当前仓库已经将这份样式收敛到共享资产 `../babel-arcaea-code/assets/reading/arcaea-article-content.css`。如果发布环境启用了 `babel-arcaea-code`，文章正文应尽量只保留 `.arcaea-article-content` 包裹和内容本身，避免重复内联整段 CSS。
 
-| Token | Value | 用途 |
-|-------|-------|------|
-| --arcaea-bg | `rgba(8,21,42,0.42)` | 卡片深蓝半透明底 |
-| --arcaea-border | `rgba(230,238,255,0.78)` | 亮白细边框 |
-| --arcaea-primary | `rgba(238,244,255,0.96)` | 标题/强调文字 |
-| --arcaea-text | `rgba(238,244,255,0.94)` | 正文 |
-| --arcaea-muted | `rgba(238,244,255,0.65)` | 辅助文字 |
-| --arcaea-hash | `rgba(255,130,130,0.55)` | 标题 # 标记 |
+## 表格策略
 
-核心样式：`backdrop-filter: blur(12px) saturate(130%)` + `box-shadow: ... inset 0 1px 0 rgba(255,255,255,0.12)`（白色内嵌高光边）。
+长文默认有两种表格形态：
+
+1. **普通对比表**：用于概念对比、参数说明、约束清单
+2. **功能矩阵**（`arcaea-feature-matrix`）：用于函数模式、模块职责、源码签名索引
+
+普通对比表回退到旧版 skill 样式：表格外壳使用 `var(--arcaea-bg)` 玻璃底、`var(--arcaea-border)` 边框和轻 blur，表头使用 `rgba(164, 186, 236, 0.10)` 弱高亮；保持强表头、弱网格、轻奇偶行，不做首列光标、轨道光条或高透明重玻璃。
+
+普通技术对比表优先按 4 列阅读模型处理：层次/对象列 18%、说明列 42%、方法/工具列 25%、状态列 15%。如果 Markdown 生成了空的首列表头占位，生产 CSS 会隐藏该空表头，使正文四列与「层次 / 方法 / 工具 / 当前状态」重新对齐。
+
+功能矩阵使用 `table.arcaea-feature-matrix`，并在单元格内部配合这些类名：
+
+- `.func-name`
+- `.signature`
+- `.line-badge`
+- `.purpose`
+- `.purpose-title`
+- `.purpose-tag`
+
+如果一张表已经同时出现函数名、签名、行号、用途四类信息，就不要再把它当普通 `<table>` 处理。
+
+## 推荐版 CSS
+
+> **此节已不再维护。** 完整且最新的 CSS 在生产代码中：
+> `babel-arcaea-code/assets/reading/arcaea-article-content.css`
+>
+> 下面保留的设计原则、决策树、表格策略和 arcaea-title-hero 结构说明仍然适用。
+> Token 值请查阅 `references/visual-tokens.md`。
+
+推荐发布流程：
+
+1. 正文中只保留 `.arcaea-article-content` 包裹和内容，不内联 CSS。
+2. 共享样式由 `babel-arcaea-code` 插件自动注入。
+3. 任何颜色或表格调整，先改生产 CSS（`assets/reading/arcaea-article-content.css`），再同步 `visual-tokens.md`。
+
+## arcaea-title-hero 结构
+
+如果文章开头需要 Games 风格的"左侧标题 + 引文 + 右下 TAG"构图，使用：
+
+```html
+<header class="arcaea-title-hero">
+  <div class="arcaea-title-main">
+    <h1><span class="arcaea-title-icon">🎮</span>Games</h1>
+  </div>
+  <p class="arcaea-title-quote">
+    <span>游戏对我来说，并不只是「消遣」。</span>
+  </p>
+  <ul class="arcaea-title-tags">
+    <li>废墟文明</li>
+    <li>数字空间</li>
+    <li>孤独感</li>
+  </ul>
+</header>
+```
+
+CSS 样式定义在生产 CSS 的 `.arcaea-title-hero` 系列选择器中。
+
+## Mermaid 图表样式
+
+Mermaid 图表渲染样式由 `babel-arcaea-code` 插件自动加载（`assets/mermaid/mermaid.css`），无需在文章正文中重复定义。
+
+**不要在文章正文中粘贴或复制这些样式。** 正文只保留 Mermaid 源码块，渲染统一交给插件。

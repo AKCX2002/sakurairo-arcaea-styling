@@ -1,6 +1,6 @@
 # Arcaea Lite — Hub/Index Page Wrapper (v5.5)
 
-用于非内容密集型页面（关于、工具箱、嵌入式专题、游记等）的轻量 Arcaea 包裹层。
+用于非内容密集型页面（关于、工具箱、嵌入式专题、游记等）的轻量 Arcaea 包裹层，不作为常规博客文章正文模板。**仅当外部样式注入不可行时，作为过渡方案临时内联 CSS。**
 
 **v5.5 关键变更**：移除 bg-overlay（backdrop-filter 模糊层）和 ::before 噪声纹理——这些 fixed 定位元素会覆盖正文使其不可读。Games/Music 页面保留 overlay（有卡片衬底提供对比度），Lite 页面不可用。
 
@@ -15,7 +15,7 @@
 - 使用 card-group 和 entry-card 替代固定卡片系统
 - 覆盖所有内容元素（li, code, strong, p, h2, blockquote）的 Sakurairo 默认颜色
 
-## CSS 模板（紧凑单行防 wpautop）
+## CSS 模板（Lite 页面专用；仅外部注入不可行时再临时内联，CSS 需紧凑防 wpautop）
 
 ```css
 :root{--theme-skin:#0a0e18;--theme-skin-dark:#05070d;--global-font-weight:300}
@@ -45,7 +45,7 @@ pre,code{font-family:"FiraCode Nerd Font","Fira Code","JetBrainsMono Nerd Font",
 ## HTML 包裹结构
 
 ```html
-<style>/* CSS 模板 */</style>
+<style>/* 仅在当前页面无法复用共享模板时，才内联这段 Lite CSS */</style>
 <div class="arcaea-wrap">
 <div class="bg-glow-1"></div>
 <div class="bg-glow-2"></div>

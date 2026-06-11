@@ -41,7 +41,7 @@ insert_pos = first_p_end + 4
 
 ## 格式
 
-Mermaid 代码块的正确格式（插件 JS 的 `pre code.language-mermaid` 选择器只匹配这种）：
+Mermaid 代码块的正确格式（插件 PHP filter 识别并转换这种输入）：
 
 ```html
 <pre><code class="language-mermaid">flowchart TD

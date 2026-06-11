@@ -1,5 +1,10 @@
 # Prism/Mermaid 冲突调试记录
 
+> ⚠️ **仅限历史参考**
+> 本文档记录的是 babel-arcaea-mermaid 旧版本的 Prism/Mermaid 冲突调试过程。
+> **当前 babel-arcaea-code 插件已通过 PHP `the_content` filter 在服务端解决此问题。**
+> 本文输出格式和 JS 方案均为旧版做法，**不可直接复制为当前实现**。
+
 ## 问题
 
 WordPress 页面中 `<pre><code class="language-mermaid">` 无法渲染为 Mermaid SVG，
@@ -12,7 +17,7 @@ prism-toolbar.js:101 Uncaught TypeError: Cannot read properties of null (reading
 
 Prism.js autoloader 异步加载 `prism-mermaid.min.js` 组件。
 其 `setTimeout` 回调持有原始 `<pre>` 元素引用。
-当 Mermaid 插件的 JS 将 `<pre>` 替换为 `<div class="mermaid">` 后，
+当 Mermaid 插件的前端原型方案将 `<pre>` 替换为 Mermaid 容器后，
 Prism 回调尝试在已不存在的 `<pre>` 上操作 → null 错误。
 
 ## 失败方案（按尝试顺序）
@@ -33,8 +38,8 @@ add_filter('the_content', function ($content) {
     return preg_replace_callback($pattern, function ($m) {
         $code = trim(html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         if (!$code) return $m[0];
-        return '<div class="arcaea-mermaid-box"><div class="mermaid arcaea-mermaid-diagram">'
-            . esc_html($code) . '</div></div>';
+        return '<div class="arcaea-mermaid-box"><pre class="mermaid">'
+            . esc_html($code) . '</pre></div>';
     }, $content);
 }, 1);  // priority 1: before wpautop (10)
 ```
