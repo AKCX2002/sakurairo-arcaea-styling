@@ -10,6 +10,6 @@
     "migrate:wp": "node scripts/migrate-wordpress.mjs"
   },
   "dependencies": {
-    "astro": "^4.16.18"
+    "astro": "^6.1.10"
   }
 }
