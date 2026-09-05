@@ -54,6 +54,8 @@ bash sakurairo-theme/install.sh
 
 原提交及作者保留在主仓库历史中，原仓库保留迁移说明。后续修改统一提交到此处；无需继续 subtree pull。旧 checkout 可作为历史参考，不应继续在那里开发技能。
 
+旧 Mermaid 仓库已发布 v1.1.10 过渡包，将 WordPress 更新源迁移到本仓库，其原 Release & Sync 已停用。本仓库同版插件包已发布并检查目录结构与更新地址。两个旧技能安装入口也已转向本仓库。生产 `babel-arcaea-code` 保持 v1.6.85。
+
 ## 许可
 
 主仓库及技能遵循各目录的 MIT 许可；独立 Mermaid 插件遵循其 GPL-2.0-or-later 许可。外部主题、插件和工具子模块保留各自许可，主仓库许可不覆盖它们。
