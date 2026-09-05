@@ -1,5 +1,27 @@
+diff --git a/comments.php b/comments.php
+index 3316959..f0aa1e2 100644
+--- a/comments.php
++++ b/comments.php
+@@ -183,14 +183,15 @@ function get_smilies_panel() {
+                                             <label class="input-label">' . esc_html(iro_opt('comment_placeholder_text')) . '</label>
+                                         </div>' . $smilies_box . 
+                                         '<div id="upload-img-show"></div>',
+-                'submit_button'     => '<div class="form-submit">
++                // WordPress formats submit_button with sprintf; URLs and labels are literal text.
++                'submit_button'     => str_replace('%', '%%', '<div class="form-submit">
+                                             <input name="submit" type="submit" id="submit" class="submit" value=" ' . esc_attr(iro_opt('comment_submit_button_text')) . ' ">' . $smilies_button . $img_upload .'
+                                             <label class="markdown-toggle">
+                                                 <input type="checkbox" id="enable_markdown" name="enable_markdown">
+                                                 <i class="fa-brands fa-markdown fa-sm"></i>
+                                             </label>
+                                             ' . wp_nonce_field('sakurairo_ajax_comment', 'sakurairo_comment_nonce', true, false) . '
+-                                        </div>',
++                                        </div>'),
+                 'comment_notes_after'  => '',
+                 'comment_notes_before' => '',
+                 'fields'            => (!is_user_logged_in()?apply_filters('comment_form_default_fields', array(
 diff --git a/css/responsive.css b/css/responsive.css
-index 5dfdef7d..7815e848 100644
+index 5dfdef7..7815e84 100644
 --- a/css/responsive.css
 +++ b/css/responsive.css
 @@ -937,4 +937,18 @@
@@ -24,7 +46,7 @@ index 5dfdef7d..7815e848 100644
 +  outline-offset: -3px;
 +}
 diff --git a/functions.php b/functions.php
-index bdd8d37c..9bf1c703 100644
+index 7fdd4d4..4083178 100644
 --- a/functions.php
 +++ b/functions.php
 @@ -504,6 +504,16 @@ function sakura_scripts()
@@ -63,7 +85,7 @@ index bdd8d37c..9bf1c703 100644
          wp_enqueue_style('iro-templates', $core_lib_basepath . '/css/templates.css', array('iro-css'), IRO_VERSION);
  
 diff --git a/header.php b/header.php
-index 692c56d2..b52ebf45 100644
+index 692c56d..b52ebf4 100644
 --- a/header.php
 +++ b/header.php
 @@ -59,7 +59,7 @@ header('X-Frame-Options: SAMEORIGIN');
@@ -100,7 +122,7 @@ index 692c56d2..b52ebf45 100644
          <?php if($show_search) : ?>
          <div class="mo-menu-search">
 diff --git a/js/nav.js b/js/nav.js
-index ed564523..1caaa0ea 100644
+index ed56452..1caaa0e 100644
 --- a/js/nav.js
 +++ b/js/nav.js
 @@ -1108,6 +1108,8 @@ document.addEventListener("DOMContentLoaded", () => {

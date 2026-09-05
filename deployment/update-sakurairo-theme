@@ -1,0 +1,175 @@
+#!/bin/sh
+set -eu
+
+repo_url='https://github.com/mirai-mamori/Sakurairo.git'
+branch='main'
+container='1Panel-wordpress-0vCB'
+themes_dir='/opt/1panel/apps/wordpress/wordpress/data/wp-content/themes'
+theme_dir="$themes_dir/Sakurairo"
+backup_dir='/opt/1panel/backup/sakurairo-theme'
+local_patch='/etc/sakurairo-theme/local-overrides.patch'
+lock_file='/run/lock/sakurairo-theme-update.lock'
+stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+stage_dir=''
+rollback_dir=''
+rollback_ready=0
+
+log() {
+    printf '%s %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"
+}
+
+apply_permissions() {
+    target="$1"
+    chown -R www-data:www-data "$target"
+    find "$target" -type d -exec chmod 0755 {} +
+    find "$target" -type f -exec chmod 0644 {} +
+}
+
+cleanup() {
+    result=$?
+    trap - EXIT INT TERM HUP
+
+    if [ "$result" -ne 0 ] && [ "$rollback_ready" -eq 1 ] && [ -d "$rollback_dir" ]; then
+        log "update failed; restoring previous theme"
+        if [ -d "$theme_dir" ]; then
+            failed_dir="$themes_dir/.Sakurairo.failed-$stamp"
+            mv "$theme_dir" "$failed_dir"
+            log "failed candidate preserved at $failed_dir"
+        fi
+        mv "$rollback_dir" "$theme_dir"
+        apply_permissions "$theme_dir" || true
+        docker exec "$container" php -r 'require "/var/www/html/wp-load.php"; exit(get_option("stylesheet") === "Sakurairo" ? 0 : 1);' || true
+    fi
+
+    if [ -n "$stage_dir" ] && [ -d "$stage_dir" ]; then
+        case "$stage_dir" in
+            "$themes_dir"/.Sakurairo.stage.*) rm -rf -- "$stage_dir" ;;
+            *) log "refusing to remove unexpected stage path: $stage_dir" ;;
+        esac
+    fi
+
+    exit "$result"
+}
+
+trap cleanup EXIT INT TERM HUP
+
+exec 9>"$lock_file"
+if ! flock -n 9; then
+    log 'another Sakurairo update is already running'
+    exit 0
+fi
+
+for required in git docker curl tar gzip flock; do
+    command -v "$required" >/dev/null 2>&1 || {
+        log "required command is missing: $required"
+        exit 1
+    }
+done
+
+docker inspect -f '{{.State.Running}}' "$container" | grep -qx true
+mkdir -p "$themes_dir" "$backup_dir"
+
+remote_head="$(git ls-remote "$repo_url" "refs/heads/$branch" | awk 'NR == 1 {print $1}')"
+case "$remote_head" in
+    ''|*[!0-9a-f]*) log 'GitHub did not return a valid commit; keeping current theme'; exit 1 ;;
+esac
+
+patch_hash="$(sha256sum "$local_patch" | awk '{print $1}')"
+current_head='missing'
+current_base='missing'
+deployed_patch_hash='missing'
+current_clean=0
+if [ -d "$theme_dir/.git" ]; then
+    current_head="$(git -c safe.directory="$theme_dir" -C "$theme_dir" rev-parse HEAD 2>/dev/null || printf invalid)"
+    current_base="$(git -c safe.directory="$theme_dir" -C "$theme_dir" rev-parse refs/remotes/origin/main 2>/dev/null || printf invalid)"
+    if [ -f "$theme_dir/.sakurairo-local-patch.sha256" ]; then
+        deployed_patch_hash="$(cat "$theme_dir/.sakurairo-local-patch.sha256")"
+    fi
+    if [ -z "$(git -c safe.directory="$theme_dir" -C "$theme_dir" status --porcelain 2>/dev/null || printf invalid)" ]; then
+        current_clean=1
+    fi
+    if [ "$current_clean" -ne 1 ]; then
+        log 'live theme has unrecorded edits; integrate them into local-overrides.patch before updating'
+        exit 1
+    fi
+    # A clean extra commit is also a local edit, even without a worktree diff.
+    actual_patch_hash="$(git -c safe.directory="$theme_dir" -C "$theme_dir" diff "$current_base" HEAD -- . ':!.sakurairo-local-patch.sha256' | sha256sum | awk '{print $1}')"
+    if [ "$actual_patch_hash" != "$deployed_patch_hash" ]; then
+        log 'live theme commits differ from the recorded patch; keeping the current theme'
+        exit 1
+    fi
+fi
+
+if [ "$current_base" = "$remote_head" ] && [ "$deployed_patch_hash" = "$patch_hash" ] && [ "$current_clean" -eq 1 ]; then
+    apply_permissions "$theme_dir"
+    log "already current at upstream $remote_head with local patch $patch_hash; permissions verified"
+    exit 0
+fi
+
+log "cloud update required: current=$current_head base=$current_base remote=$remote_head patch=$patch_hash deployed_patch=$deployed_patch_hash clean=$current_clean"
+stage_dir="$(mktemp -d "$themes_dir/.Sakurairo.stage.XXXXXX")"
+git clone --quiet --depth 1 --single-branch --branch "$branch" "$repo_url" "$stage_dir/Sakurairo"
+candidate="$stage_dir/Sakurairo"
+candidate_head="$(git -C "$candidate" rev-parse HEAD)"
+[ "$candidate_head" = "$remote_head" ]
+[ -f "$candidate/style.css" ]
+[ -f "$candidate/functions.php" ]
+grep -q '^Theme Name: Sakurairo$' "$candidate/style.css"
+
+if ! git -C "$candidate" apply --3way "$local_patch"; then
+    log 'local overrides conflict with the new cloud version; keeping the current live theme'
+    exit 1
+fi
+printf '%s\n' "$patch_hash" > "$candidate/.sakurairo-local-patch.sha256"
+git -C "$candidate" add -A
+git -C "$candidate" -c user.name='Sakurairo Updater' -c user.email='root@localhost' commit --quiet -m "Apply local Sakurairo overrides ($patch_hash)"
+
+container_candidate="/var/www/html/wp-content/themes/$(basename "$stage_dir")/Sakurairo"
+docker exec "$container" sh -lc 'find "$1" -type f -name "*.php" -print0 | xargs -0 -n1 php -l >/tmp/sakurairo-candidate-lint.log' sh "$container_candidate"
+docker exec "$container" tail -n 3 /tmp/sakurairo-candidate-lint.log
+curl -fsS -o /dev/null -H 'Host: babel36acl.xyz' http://127.0.0.1:8080/
+
+if [ -d "$theme_dir" ]; then
+    backup="$backup_dir/Sakurairo-$stamp.tar.gz"
+    tar -C "$themes_dir" -czf "$backup" Sakurairo
+    gzip -t "$backup"
+    cp "$local_patch" "$backup_dir/Sakurairo-$stamp.local-overrides.patch"
+    if [ -d "$theme_dir/.git" ]; then
+        git -c safe.directory="$theme_dir" -C "$theme_dir" status --short --branch > "$backup_dir/Sakurairo-$stamp.status.txt" || true
+        git -c safe.directory="$theme_dir" -C "$theme_dir" diff --binary > "$backup_dir/Sakurairo-$stamp.patch" || true
+    fi
+    rollback_dir="$themes_dir/.Sakurairo.rollback-$stamp"
+    mv "$theme_dir" "$rollback_dir"
+    rollback_ready=1
+    log "previous theme archived at $backup"
+fi
+
+mv "$candidate" "$theme_dir"
+apply_permissions "$theme_dir"
+
+docker exec "$container" php -r 'require "/var/www/html/wp-load.php"; if (get_option("stylesheet") !== "Sakurairo" || get_option("template") !== "Sakurairo") { fwrite(STDERR, "Sakurairo is not the active template\n"); exit(1); } echo "active_theme=Sakurairo\n";'
+curl -fsS -o /dev/null -w 'local_http=%{http_code}\n' -H 'Host: babel36acl.xyz' http://127.0.0.1:8080/
+
+# A PHP fatal in comments can truncate an article after HTTP 200 was sent.
+# Check a real article with an encoded permalink and the footer scripts, not just home.
+health_page="$stage_dir/article-health.html"
+curl -fsSL --resolve babel36acl.xyz:443:127.0.0.1 "https://babel36acl.xyz/?p=796&theme_health=$stamp" -o "$health_page"
+grep -q 'bac-content-loader-js' "$health_page"
+grep -q '</html>' "$health_page"
+if grep -q 'There has been a critical error' "$health_page"; then
+    log 'article rendering failed after theme update'
+    exit 1
+fi
+rm -f -- "$health_page"
+
+if [ "$rollback_ready" -eq 1 ]; then
+    case "$rollback_dir" in
+        "$themes_dir"/.Sakurairo.rollback-*) rm -rf -- "$rollback_dir" ;;
+        *) log "refusing to remove unexpected rollback path: $rollback_dir"; exit 1 ;;
+    esac
+    rollback_ready=0
+fi
+
+rmdir "$stage_dir"
+stage_dir=''
+log "Sakurairo updated successfully to upstream $candidate_head with local patch $patch_hash"

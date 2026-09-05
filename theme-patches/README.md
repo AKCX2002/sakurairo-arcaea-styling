@@ -1,6 +1,6 @@
-# Sakurairo 原生导航修复
+# Sakurairo 本地主题修复与部署
 
-`navigation-accessibility.diff` 修改主题自己的 `header.php`、`js/nav.js`、`css/responsive.css`、`functions.php`，不向文章或插件注入导航补偿脚本。
+`navigation-accessibility.diff` 修改主题自己的 `header.php`、`js/nav.js`、`css/responsive.css`、`functions.php` 和 `comments.php`，不向文章或插件注入补偿脚本。当前补丁基于 Sakurairo 3.0.11 的上游提交 `85ca5418e9e3280f6e2b9ed1ca9cab68d57bcaf3`；下列旧版本记录保留用于追溯。
 
 - 源码：工作区 `Sakurairo`，上游 `mirai-mamori/Sakurairo`，基准提交 `365dabc1024513948f1b3705f3ae8aa2abc97a3b`。
 - 本地分支：`fix/navigation-accessibility`。
@@ -13,7 +13,7 @@
 - VPS 部署备份：`/root/blog-page-fix-20260905/plugin-before.tar`、`theme-before.tar`；主题路径为 `/opt/1panel/apps/wordpress/wordpress/data/wp-content/themes/Sakurairo`。
 - 后续缓存修复前的 `header.php`、`functions.php` 备份为 `/root/blog-page-fix-20260905/theme-cache-before.tar`。完整回退到本次部署前时，先还原此备份，再还原 `theme-before.tar`，插件使用 `plugin-before.tar` 恢复。
 
-新部署前必须读取实际主题路径和版本，备份上述四个文件，然后在目标主题目录执行 `git apply --check` 检查差异是否仍匹配；匹配后才应用。已部署前三个文件的站点只应用后续缓存差异，并额外备份 `functions.php` 和当前 `header.php`。回滚使用原始文件。主题更新后需重新核对差异，不能盲目覆盖新版本文件。
+新部署前必须读取实际主题路径和版本，备份受影响文件，再在干净的上游候选目录执行 `git apply --check`。线上已经应用补丁，不得再次盲目应用完整补丁。后续部署使用下述自动更新器保留本地修复。
 
 注意：聚合仓库中的 `sakurairo-theme` 子模块实际是主题使用技能，不包含运行主题 PHP/JS；不能把它当作可部署主题。插件版本在 `babel-arcaea-code` 子模块固定为 v1.6.85（`1e5765e004deca8a7fd91156144ad5337a91f64f`）。此前 v1.6.84 渲染生命周期重构已发布并部署：首次加载/PJAX 统一调度，按正文释放观察器、D3 动画和图片绑定；两种公式引擎及页面往返回归已在本地和 GitHub Actions 通过。线上 STM32 文章图表、高亮和单一全屏入口验证通过。该轮插件回滚包为 `/root/blog-lifecycle-20260905/plugin-before.tar`（v1.6.83）。
 
@@ -26,3 +26,12 @@
 - 已扫描的 55 篇已发布文章/页面没有 Markmap 源码，图片缩放也尚无有效线上内容样本；这两项真实内容验收仍待补充，不以自动化结果替代。
 - 设置页文字显示修复已按用户要求撤回，未发布该显示改动。
 - 本轮回滚包：`/root/blog-dependency-20260906/plugin-before.tar`（v1.6.84）。本次仅同步集成仓库和记录，不再次部署或修改线上配置。
+
+## 主题自动更新与评论修复（2026-09-06）
+
+- 线上主题为 Sakurairo 3.0.11，上游 `85ca5418`，本地修复以 `/etc/sakurairo-theme/local-overrides.patch` 为部署输入。每日北京时间 04:20 起随机 30 分钟内检查上游 main；补丁冲突时保留当前主题。
+- 更新器源码见 [`deployment/update-sakurairo-theme`](../deployment/update-sakurairo-theme)，服务器安装路径 `/usr/local/sbin/update-sakurairo-theme`；服务/定时器为 `sakurairo-theme-update.service`、`sakurairo-theme-update.timer`。
+- 评论表单的 `submit_button` 会被 WordPress 当作 `sprintf` 模板；其中 nonce 隐藏字段的中文文章 referrer 带有百分号编码，导致 `Unknown format specifier`，截断页脚及插件脚本。`comments.php` 现在把模板中的字面百分号转义为 `%%`，输出时恢复原值，保留 nonce 与评论功能。该缺陷不在 KaTeX 配置中。
+- 更新器遇到工作区修改或与已记录补丁不符的额外提交时停止，防止覆盖新增定制。修改主题后应先更新受版本控制的补丁，再同步服务器补丁，不能仅编辑线上文件。
+- 部署后的健康检查同时验证文章 ID 796 的完整 HTML 和 `bac-content-loader-js`，避免 HTTP 200 掩盖评论模板中途崩溃。生产插件仍固定 v1.6.85，KaTeX 保持启用。
+- 本次修复前的评论文件、补丁、更新器、提交号和补丁哈希位于 `/opt/1panel/backup/sakurairo-theme/comment-format-20260906/`。完整主题更新备份位于 `/opt/1panel/backup/sakurairo-theme/`。回滚必须同时恢复主题版本、对应补丁及哈希，避免自动更新状态不一致。
