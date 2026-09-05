@@ -23,8 +23,47 @@ index 5dfdef7d..7815e848 100644
 +  outline: 2px solid currentColor;
 +  outline-offset: -3px;
 +}
+diff --git a/functions.php b/functions.php
+index bdd8d37c..9bf1c703 100644
+--- a/functions.php
++++ b/functions.php
+@@ -504,6 +504,16 @@ function sakura_scripts()
+     global $shared_lib_basepath;
+ 
+     // 预加载主要样式文件
++    // Local theme edits must invalidate both the combined and separate stylesheet URLs.
++    $style_version = IRO_VERSION;
++    if (iro_opt('core_library_basepath')) {
++        $style_files = array_merge(
++            array(get_template_directory() . '/style.css'),
++            glob(get_template_directory() . '/css/*.{css,php}', GLOB_BRACE),
++            glob(get_template_directory() . '/css/content-style/*.css')
++        );
++        $style_version .= '.' . max(array_map('filemtime', $style_files));
++    }
+     if(iro_opt('dev_mode',false) == false) { // 压缩并缓存主题样式
+         
+         function add_cache_control_header() { // 添加缓存策略
+@@ -520,7 +530,7 @@ function sakura_scripts()
+         if (strpos(get_option('permalink_structure'), 'index.php') !== false) {
+             $index = 'index.php';
+         }
+-        $iro_css = $core_lib_basepath . '/css/' . $index . '?' . $sakura_header . '&' . $content_style . '&' . $wave . '&minify&' . IRO_VERSION;
++        $iro_css = $core_lib_basepath . '/css/' . $index . '?' . $sakura_header . '&' . $content_style . '&' . $wave . '&minify&' . $style_version;
+         add_action('wp_head', function() use ($iro_css) {
+             echo '<link rel="preload" href="' .$iro_css. '" as="style" onload="this.onload=null;this.rel=\'stylesheet\'">';
+             echo '<link rel="stylesheet" href="' . $iro_css . '">';
+@@ -530,7 +540,7 @@ function sakura_scripts()
+         wp_enqueue_style('iro-css', $core_lib_basepath . '/style.css', array(), IRO_VERSION);
+         wp_enqueue_style('iro-codes', $core_lib_basepath . '/css/shortcodes.css', array(), IRO_VERSION);
+         wp_enqueue_style('iro-dark', $core_lib_basepath . '/css/dark.css', array('iro-css'), IRO_VERSION);
+-        wp_enqueue_style('iro-responsive', $core_lib_basepath . '/css/responsive.css', array('iro-css'), IRO_VERSION);
++        wp_enqueue_style('iro-responsive', $core_lib_basepath . '/css/responsive.css', array('iro-css'), $style_version);
+         wp_enqueue_style('iro-animation', $core_lib_basepath . '/css/animation.css', array('iro-css'), IRO_VERSION);
+         wp_enqueue_style('iro-templates', $core_lib_basepath . '/css/templates.css', array('iro-css'), IRO_VERSION);
+ 
 diff --git a/header.php b/header.php
-index 692c56d2..38f92f3f 100644
+index 692c56d2..b52ebf45 100644
 --- a/header.php
 +++ b/header.php
 @@ -59,7 +59,7 @@ header('X-Frame-Options: SAMEORIGIN');
@@ -36,6 +75,15 @@ index 692c56d2..38f92f3f 100644
  
      <!-- 优化资源加载 -->
      <meta http-equiv="x-dns-prefetch-control" content="on">
+@@ -137,7 +137,7 @@ header('X-Frame-Options: SAMEORIGIN');
+         });
+     });
+ 	</script>
+-    <script src="<?= $core_lib_basepath . '/js/nav.js' ?>" defer></script>
++    <script src="<?= esc_url(add_query_arg('ver', iro_opt('core_library_basepath') ? filemtime(get_template_directory() . '/js/nav.js') : IRO_VERSION, $core_lib_basepath . '/js/nav.js')) ?>" defer></script>
+ </head>
+ 
+ <body <?php body_class(); ?>>
 @@ -159,10 +159,10 @@ header('X-Frame-Options: SAMEORIGIN');
      
      <header class="site-header no-select" role="banner">
