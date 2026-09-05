@@ -1,11 +1,11 @@
-name: Release & Sync
+name: Mermaid Release & Sync
 
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - '**.md'
-      - '.gitignore'
+    paths:
+      - 'babel-arcaea-mermaid/**'
+      - '.github/workflows/mermaid-release.yml'
   schedule:
     - cron: '0 6 * * *'       # daily 06:00 UTC
   workflow_dispatch:
@@ -23,6 +23,14 @@ on:
 permissions:
   contents: write
   pull-requests: write
+
+concurrency:
+  group: mermaid-release
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: babel-arcaea-mermaid
 
 jobs:
   # ── Job 1: Auto-bump patch + release ──
@@ -194,6 +202,7 @@ jobs:
             | **Source** | — | [mermaid-js/mermaid releases](https://github.com/mermaid-js/mermaid/releases) |
 
             **Action required**: Review release notes for breaking changes before merging.
+          add-paths: babel-arcaea-mermaid/babel-arcaea-mermaid.php
           branch: chore/mermaid-bump-${{ steps.latest.outputs.latest }}
           base: main
           labels: automated, dependencies

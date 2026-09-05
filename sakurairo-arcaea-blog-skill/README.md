@@ -49,14 +49,14 @@ Arcaea 风格不是普通二次元 UI，而是一种 **"未来感 × 情绪化 �
 ### 方式 1：Git Clone（推荐）
 
 ```bash
-git clone --depth 1 https://github.com/AKCX2002/sakurairo-arcaea-blog-skill.git
-cp sakurairo-arcaea-blog-skill/SKILL.md ~/.hermes/skills/sakurairo-arcaea-blog-skill/
+git clone --depth 1 https://github.com/AKCX2002/sakurairo-arcaea-styling.git
+bash sakurairo-arcaea-styling/sakurairo-arcaea-blog-skill/install.sh
 ```
 
 ### 方式 2：安装脚本
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/AKCX2002/sakurairo-arcaea-blog-skill/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/AKCX2002/sakurairo-arcaea-styling/main/sakurairo-arcaea-blog-skill/install.sh)
 ```
 
 ### 方式 3：Hermes Skills（即将支持）
@@ -94,7 +94,7 @@ skill_view(name="sakurairo-arcaea-blog-skill")
 ### Skills.sh 生态（可选增强）
 | 技能 | 安装量 | 用途 | 仓源码 |
 |------|--------|------|--------|
-| `sakurairo-theme` | — | Sakurairo 主题功能完整指南 | [`AKCX2002/sakurairo-theme`](https://github.com/AKCX2002/sakurairo-theme) |
+| `sakurairo-theme` | — | Sakurairo 主题功能完整指南 | [主仓库技能目录](../sakurairo-theme/) |
 | `wordpress-pro` | 4.9K ⭐ | WordPress 专业开发 | — |
 | `ckm:design` / `ui-ux-pro-max` | 21.2K ⭐ | UI/UX 设计综合 | — |
 | `tailwind` | 46.7K ⭐ | Tailwind CSS v4 | — |

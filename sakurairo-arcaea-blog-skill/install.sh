@@ -1,31 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
-SKILL_NAME="sakurairo-arcaea-blog-skill"
-REPO="AKCX2002/${SKILL_NAME}"
+SKILL_NAME='sakurairo-arcaea-blog-skill'
 DEST="${HERMES_HOME:-$HOME/.hermes}/skills/${SKILL_NAME}"
-
-echo "📦 Installing ${SKILL_NAME}..."
-
-# Ensure target dir exists
-mkdir -p "$DEST"
-
-# Download via curl or git clone
-if command -v git &>/dev/null; then
-  echo " → Cloning from GitHub..."
-  git clone --depth 1 "https://github.com/${REPO}.git" /tmp/${SKILL_NAME} 2>/dev/null
-  cp /tmp/${SKILL_NAME}/SKILL.md "$DEST/"
-  cp /tmp/${SKILL_NAME}/README.md "$DEST/" 2>/dev/null || true
-  rm -rf /tmp/${SKILL_NAME}
-else
-  echo " → Downloading release zip..."
-  curl -sL "https://github.com/${REPO}/releases/latest/download/${SKILL_NAME}.zip" \
-    -o /tmp/${SKILL_NAME}.zip
-  unzip -o /tmp/${SKILL_NAME}.zip -d "$DEST/" >/dev/null 2>&1
-  rm -f /tmp/${SKILL_NAME}.zip
+source_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+staging=''
+cleanup() { if [ -n "$staging" ] && [ -d "$staging" ]; then rm -rf -- "$staging"; fi; }
+trap cleanup EXIT
+if [ ! -f "$source_dir/SKILL.md" ]; then
+    staging="$(mktemp -d -t sakurairo-skill.XXXXXX)"
+    git clone --quiet --depth 1 https://github.com/AKCX2002/sakurairo-arcaea-styling.git "$staging/repo"
+    source_dir="$staging/repo/$SKILL_NAME"
 fi
-
-echo "✅ Installed to: ${DEST}/SKILL.md"
-echo ""
-echo "📖 To use, load the skill in Hermes:"
-echo "   skill_view(name=\"${SKILL_NAME}\")"
+mkdir -p "$DEST"
+for item in SKILL.md README.md LICENSE references scripts; do
+    if [ -e "$source_dir/$item" ]; then cp -R -- "$source_dir/$item" "$DEST/"; fi
+done
+printf 'Installed %s to %s\n' "$SKILL_NAME" "$DEST"

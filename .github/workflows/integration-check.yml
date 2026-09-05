@@ -1,0 +1,38 @@
+name: Integration Check
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deployment/**'
+      - 'theme-patches/**'
+      - 'sakurairo-theme/install.sh'
+      - 'sakurairo-arcaea-blog-skill/install.sh'
+      - '.github/workflows/integration-check.yml'
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check deployment and installer shell syntax
+        run: |
+          sh -n deployment/update-sakurairo-theme
+          bash -n sakurairo-theme/install.sh
+          bash -n sakurairo-arcaea-blog-skill/install.sh
+      - name: Apply theme patch and reproduce encoded comment URL
+        run: |
+          git clone --quiet https://github.com/mirai-mamori/Sakurairo.git /tmp/theme-check
+          git -C /tmp/theme-check checkout --detach 85ca5418e9e3280f6e2b9ed1ca9cab68d57bcaf3
+          git -C /tmp/theme-check apply --check "$GITHUB_WORKSPACE/theme-patches/navigation-accessibility.diff"
+          git -C /tmp/theme-check apply "$GITHUB_WORKSPACE/theme-patches/navigation-accessibility.diff"
+          php -l /tmp/theme-check/comments.php
+          php deployment/check-comment-template.php /tmp/theme-check/comments.php
+      - name: Check both skill installations with references
+        run: |
+          HERMES_HOME=/tmp/hermes-check bash sakurairo-arcaea-blog-skill/install.sh
+          CODEKX_HOME=/tmp/agents-check bash sakurairo-theme/install.sh
+          diff -qr sakurairo-arcaea-blog-skill/references /tmp/hermes-check/skills/sakurairo-arcaea-blog-skill/references
+          diff -qr sakurairo-theme/references /tmp/agents-check/skills/sakurairo-theme/references
+          diff -qr sakurairo-theme/scripts /tmp/agents-check/skills/sakurairo-theme/scripts

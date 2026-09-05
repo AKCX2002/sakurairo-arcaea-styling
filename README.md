@@ -1,73 +1,59 @@
-# Sakurairo Arcaea 风格化方案 🎨
+# Sakurairo Arcaea WordPress
 
-> 基于 [Sakurairo 主题](https://github.com/AKCX2002/sakurairo-theme) 的 Arcaea 风格化 WordPress 建站方案 —— 主题 + 插件 + 配置，一站聚合。
+统一维护博客技能、主题部署补丁和独立 Mermaid 插件的主仓库。生产渲染插件 [babel-arcaea-code](https://github.com/AKCX2002/babel-arcaea-code) 保持独立发布，以子模块固定版本。
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+## 目录与职责
 
-## 方案组成
+| 路径 | 维护内容 |
+| --- | --- |
+| `babel-arcaea-code/` | 独立子模块，生产插件 v1.6.85；Prism、Mermaid、Markmap、KaTeX/MathJax |
+| `babel-arcaea-mermaid/` | 合并后的独立 Mermaid 插件；供未使用统一插件的站点使用，不与生产统一插件重复启用 |
+| `sakurairo-arcaea-blog-skill/` | 合并后的博客写作、排版与发布技能 |
+| `sakurairo-theme/` | 合并后的 Sakurairo 使用技能与参考文档，**不是运行主题源码** |
+| `theme-patches/` | 上游 Sakurairo 的本地修复及生产部署记录 |
+| `deployment/` | 保留本地补丁的服务器主题更新器 |
+| `wordpress-dm1-calculator/` | 原有独立工具子模块 |
 
-本仓库是 **Git 子模块聚合主仓库**，将三个核心组件组合为完整的 Arcaea 风格化方案：
+运行主题来自 [mirai-mamori/Sakurairo](https://github.com/mirai-mamori/Sakurairo)，线上当前基于 3.0.11 加本仓库补丁。公式使用 KaTeX；部署详情和回滚位置见 [主题部署记录](theme-patches/README.md)。
 
-```text
-sakurairo-arcaea-styling/
-├── babel-arcaea-code/             ← 插件：代码高亮/图表/数学渲染
-├── sakurairo-theme/               ← 主题：Arcaea 风格基础框架
-└── sakurairo-arcaea-blog-skill/   ← 配置：AI 辅助技巧与参考文档
-```
+## 获取和维护
 
-| 子模块 | 版本 | 说明 |
-| ------ | ---- | ---- |
-| [`babel-arcaea-code`](https://github.com/AKCX2002/babel-arcaea-code) | v1.4.x | WordPress 插件 — Prism.js 代码高亮、Mermaid 图表、Markmap 思维导图、MathJax 数学渲染 |
-| [`sakurairo-theme`](https://github.com/AKCX2002/sakurairo-theme) | v1.0.x | Sakurairo 主题 — 多彩轻量 WordPress 主题，Arcaea 风格化基础框架 |
-| [`sakurairo-arcaea-blog-skill`](https://github.com/AKCX2002/sakurairo-arcaea-blog-skill) | v1.2.x | 博客配置技巧集 — AI 辅助参考文档与注入模式 |
-
-## 快速开始
-
-```bash
-# 克隆主仓库（含所有子模块）
-git clone --recursive https://github.com/AKCX2002/sakurairo-arcaea-styling.git
-
-# 如果已克隆但未拉取子模块
+```sh
+git clone --recurse-submodules https://github.com/AKCX2002/sakurairo-arcaea-styling.git
+cd sakurairo-arcaea-styling
 git submodule update --init --recursive
 ```
 
-## 日常工作流
+技能和主题补丁直接在本仓库修改、提交。生产插件先在其独立仓库发布，再更新本仓库 gitlink；不要用 `submodule update --remote` 随意替换已验证的生产版本。
 
-### 更新到最新版本
+技能安装：
 
-```bash
-# 拉取所有子模块的最新提交
-git submodule update --remote --merge
-
-# 更新特定子模块
-git submodule update --remote --merge babel-arcaea-code
-
-# 提交更新
-git add . && git commit -m "chore: 更新子模块" && git push
+```sh
+bash sakurairo-arcaea-blog-skill/install.sh
+bash sakurairo-theme/install.sh
 ```
 
-### 在子模块中开发
+安装器包含 `references/` 和 `scripts/`，也可通过各 README 的远程安装入口使用。
 
-```bash
-cd babel-arcaea-code     # 进入子模块
-# ... 开发、提交、推送 ...
-cd ..
-git add babel-arcaea-code
-git commit -m "chore: bump babel-arcaea-code to v1.4.x"
-git push
-```
+## 发布与部署
 
-## 仓库说明
+- `.github/workflows/mermaid-release.yml` 统一承接独立 Mermaid 插件的构建、发布及依赖检查。根仓库 `v1.x` Release 和 zip 对应此插件，不能作为整站部署包。
+- `babel-arcaea-code` 继续使用自身仓库的 CI 与 Release，生产站点不切换到旧 Mermaid 插件。
+- 主题更新器先获取上游 main、应用本地补丁、检查 PHP，再备份切换。检测到未记录的本地修改或补丁冲突时停止。完整文章及页脚检查失败时回滚。
+- 新增主题修改应同步 `theme-patches/navigation-accessibility.diff` 与服务器 `/etc/sakurairo-theme/local-overrides.patch`，不能直接覆盖线上后等待定时更新。
 
-- **主仓库**仅维护聚合配置（`.gitmodules`、`README`、`AGENTS.md` 等），不含业务代码
-- 各子模块保留独立的版本号、CI/CD 和发布流程
-- Issue 请按所属子模块归类提交
+## 迁移与历史
 
-## 更多文档
+2026-09-06 使用不压缩历史的 Git subtree 合并：
 
-- [`AGENTS.md`](./AGENTS.md) — AI 代理开发指引
-- [Issue 模板](./.github/ISSUE_TEMPLATE/) — Bug 报告 / 功能请求
+| 原仓库 | 导入提交 | 新路径 |
+| --- | --- | --- |
+| AKCX2002/babel-arcaea-mermaid | `a2ad4f86e5a99b42beb735bc0ef676be84130125` | `babel-arcaea-mermaid/` |
+| AKCX2002/sakurairo-arcaea-blog-skill | `de9fdd906596f65c5e772a80e0758272ab7b8d85` | `sakurairo-arcaea-blog-skill/` |
+| AKCX2002/sakurairo-theme | `c1974cdeeeeb650ef34a0b3b9be1f4a3b935199c` | `sakurairo-theme/` |
+
+原提交及作者保留在主仓库历史中，原仓库保留迁移说明。后续修改统一提交到此处；无需继续 subtree pull。旧 checkout 可作为历史参考，不应继续在那里开发技能。
 
 ## 许可
 
-主仓库采用 [MIT License](LICENSE)。各子模块遵循其各自的许可协议。
+主仓库及技能遵循各目录的 MIT 许可；独立 Mermaid 插件遵循其 GPL-2.0-or-later 许可。外部主题、插件和工具子模块保留各自许可，主仓库许可不覆盖它们。

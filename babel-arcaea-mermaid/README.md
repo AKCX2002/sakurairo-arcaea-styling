@@ -30,18 +30,18 @@
 
 ## 安装
 
-### 方法 A：Git clone（推荐）
+### 方法 A：从源码安装
 
 ```bash
-cd /var/www/html/wp-content/plugins/
-git clone https://github.com/AKCX2002/babel-arcaea-mermaid.git
+git clone https://github.com/AKCX2002/sakurairo-arcaea-styling.git
+cp -R sakurairo-arcaea-styling/babel-arcaea-mermaid /var/www/html/wp-content/plugins/
 ```
 
 然后 WordPress 后台 → 插件 → 找到 **Babel Arcaea Mermaid** → 启用。
 
 ### 方法 B：Release zip
 
-前往 [Releases](https://github.com/AKCX2002/babel-arcaea-mermaid/releases) 页面下载最新 `babel-arcaea-mermaid.zip`。
+前往 [主仓库 Releases](https://github.com/AKCX2002/sakurairo-arcaea-styling/releases) 页面下载 `babel-arcaea-mermaid-版本.zip`，不要将整仓库源码 zip 安装为插件。本插件适用于未启用统一插件 `babel-arcaea-code` 的站点。
 
 WordPress 后台 → 插件 → 安装插件 → 上传插件 → 选择 zip → 安装 → 启用。
 
@@ -167,14 +167,13 @@ SVG 图表 → 蓝白辉光标框内的毛玻璃卡片
 ## 开发
 
 ```bash
-git clone https://github.com/AKCX2002/babel-arcaea-mermaid.git
-cd babel-arcaea-mermaid
-# 修改插件后更新版本号
-sed -i 's/Version: 1.0.0/Version: 1.0.1/' babel-arcaea-mermaid.php
-git add -A
-git commit -m "bump: 1.0.1"
+git clone https://github.com/AKCX2002/sakurairo-arcaea-styling.git
+cd sakurairo-arcaea-styling
+# 修改 babel-arcaea-mermaid/ 内的插件源码
+git add babel-arcaea-mermaid
+git commit -m "fix: 修复 Mermaid 渲染"
 git push
-# GitHub Actions 自动构建 release
+# 根目录 Mermaid Release & Sync 工作流递增版本并构建插件 release
 ```
 
 ## Changelog

@@ -49,8 +49,8 @@ skill_view(name="sakurairo-theme", file_path="references/theme-options.md")
 ## 安装
 
 ```bash
-git clone --depth 1 https://github.com/AKCX2002/sakurairo-theme.git
-cp -r sakurairo-theme ~/.agents/skills/sakurairo-theme/
+git clone --depth 1 https://github.com/AKCX2002/sakurairo-arcaea-styling.git
+bash sakurairo-arcaea-styling/sakurairo-theme/install.sh
 ```
 
 ## 许可
