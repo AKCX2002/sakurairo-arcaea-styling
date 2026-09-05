@@ -1,0 +1,128 @@
+/* =========================================================
+ * Babel Arcaea Mermaid
+ * Arcaea / Sakurairo styled Mermaid diagram renderer
+ * ======================================================= */
+
+/* ---- Mermaid outer card ---- */
+.arcaea-mermaid-box {
+  margin: 1.6rem auto;
+  padding: 1rem;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(20, 34, 56, 0.82),
+      rgba(10, 18, 34, 0.88)
+    );
+
+  border: 1px solid rgba(143, 216, 255, 0.28);
+  border-radius: 16px;
+
+  box-shadow:
+    0 0 24px rgba(120, 180, 255, 0.12),
+    inset 0 0 18px rgba(255, 255, 255, 0.025);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* ---- Mermaid inner container ---- */
+.arcaea-mermaid-diagram,
+.mermaid.arcaea-mermaid-diagram {
+  min-height: unset !important;
+  height: auto !important;
+  max-height: none !important;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: #dcecff;
+  background: transparent !important;
+}
+
+/* ---- SVG sizing ---- */
+.arcaea-mermaid-diagram svg {
+  display: block;
+  max-width: 100% !important;
+  height: auto !important;
+  margin: 0 auto;
+}
+
+/* ---- Force readable text in SVG ---- */
+.arcaea-mermaid-diagram svg text,
+.arcaea-mermaid-diagram .label,
+.arcaea-mermaid-diagram .nodeLabel,
+.arcaea-mermaid-diagram .edgeLabel,
+.arcaea-mermaid-diagram .actor,
+.arcaea-mermaid-diagram .messageText,
+.arcaea-mermaid-diagram .noteText {
+  fill: #f2f8ff !important;
+  color: #f2f8ff !important;
+  font-size: 15px !important;
+  font-weight: 500;
+}
+
+/* ---- Force node & edge visibility ---- */
+.arcaea-mermaid-diagram .node rect,
+.arcaea-mermaid-diagram .node circle,
+.arcaea-mermaid-diagram .node ellipse,
+.arcaea-mermaid-diagram .node polygon,
+.arcaea-mermaid-diagram .node path {
+  stroke: #9fd2ff !important;
+  stroke-width: 1.6px !important;
+}
+
+.arcaea-mermaid-diagram .edgePath path,
+.arcaea-mermaid-diagram .flowchart-link {
+  stroke: #9fd2ff !important;
+  stroke-width: 1.8px !important;
+}
+
+.arcaea-mermaid-diagram marker path {
+  fill: #9fd2ff !important;
+  stroke: #9fd2ff !important;
+}
+
+/* ---- Prism should not touch Mermaid source blocks ---- */
+pre.no-toolbar,
+pre.no-highlight,
+pre.arcaea-mermaid-source {
+  display: none !important;
+}
+
+/* ---- Prevent Sakurairo / Prism from inheriting code styles onto Mermaid ---- */
+.arcaea-mermaid-box pre,
+.arcaea-mermaid-box code {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* ---- Error fallback ---- */
+.arcaea-mermaid-diagram.mermaid-error {
+  border: 1px solid rgba(255, 120, 120, 0.35);
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .arcaea-mermaid-box {
+    margin: 1.2rem 0;
+    padding: 0.75rem;
+    border-radius: 14px;
+  }
+
+  .arcaea-mermaid-diagram svg {
+    min-width: 560px;
+  }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .arcaea-mermaid-box {
+    transition: none;
+  }
+}
