@@ -1,0 +1,5 @@
+# Patches contain the target files' line endings, including CRLF context.
+*.diff -text
+*.patch -text
+*.sh text eol=lf
+deployment/update-sakurairo-theme text eol=lf
